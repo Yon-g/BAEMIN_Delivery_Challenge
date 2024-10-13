@@ -1,0 +1,14 @@
+<launch>
+
+<arg name="cloud_topic" default="/cropped_cloud"/>
+
+  <node name="crop_node" pkg="patchworkpp" type="crop" output="screen" />
+
+  <node name="ground_segmentation" pkg="patchworkpp" type="patchworkpp" output="screen">
+    <rosparam command="load" file="$(find patchworkpp)/config/params.yaml" />
+    <param name="cloud_topic" value="$(arg cloud_topic)"/>
+  </node>
+
+  <node name="cluster_node" pkg="patchworkpp" type="cluster" output="screen" />
+
+</launch>
