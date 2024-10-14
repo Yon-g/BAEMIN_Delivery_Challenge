@@ -1,0 +1,9 @@
+orders:
+  - index: 5
+    utm_x: 333862.9255915525
+    utm_y: 4143041.233943492
+    isPickup: true
+  - index: 5
+    utm_x: 334204.29729374615
+    utm_y: 4142966.2601580895
+    isPickup: false

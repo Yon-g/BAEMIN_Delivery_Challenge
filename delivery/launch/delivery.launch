@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="delivery" type="delivery.py" name="deli_all" output="screen">
+        <param name="order" value="$(find delivery)/config/order.yaml"/>
+    </node>
+</launch>
