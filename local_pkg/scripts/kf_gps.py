@@ -110,6 +110,8 @@ class InterGPS:
             kf_utm_x = self.kf.x[0]  # x 위치
             kf_utm_y = self.kf.x[1]  # y 위치
 
+            self.odom_msg.header = msg.header
+
             self.odom_msg.pose.pose.position.x = kf_utm_x
             self.odom_msg.pose.pose.position.y = kf_utm_y
             self.odom_msg.pose.pose.position.z = 0.
