@@ -35,7 +35,6 @@ class Deli:
         self.distance = None
         # self.check_gps = False # 데이터 수신 확인
         self.can_dis = False # 물건 적재 거리 여부
-        self.can_load = False # 물건 적재 가능 수
 
     def load_order(self):
         path = rospy.get_param('~order')
@@ -67,15 +66,10 @@ class Deli:
     def status_callback(self, msg):
         self.loaded_item = len(msg.deliveryItem)
 
-        if self.loaded_item == 2:
-            self.can_load = False
-        else:
-            self.can_load = True
-
     # 시뮬에 적재 및 배달 요청
     def timer_callback(self, event):
         try:
-            if self.can_dis and self.can_load:
+            if self.can_dis:
                 request = DillyCmd()
                 request.deliveryItemIndex = self.order[self.order_idx]['index']
                 request.isPickup = self.order[self.order_idx]['isPickup'] # True 적재, False 전달
