@@ -165,7 +165,10 @@ include_directories(
 # )
 
 catkin_install_python(PROGRAMS
-  src/delivery.py
+  scripts/delivery.py
+  scripts/dynamic_window_approach.py
+  scripts/robot_control.py
+  scripts/control.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
