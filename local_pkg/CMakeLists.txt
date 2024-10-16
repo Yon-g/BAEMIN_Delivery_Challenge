@@ -178,20 +178,9 @@ target_link_libraries(gps_imu ${catkin_LIBRARIES}  ${PROJ_LIBRARIES})
 
 catkin_install_python(PROGRAMS
   scripts/gps_heading.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-catkin_install_python(PROGRAMS
+  scripts/gps_heading_vel.py
   scripts/heading_plot.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-catkin_install_python(PROGRAMS
   scripts/kf_gps.py
-  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-catkin_install_python(PROGRAMS
   scripts/gps_velocity.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )

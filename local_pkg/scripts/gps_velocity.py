@@ -1,11 +1,9 @@
 import rospy
 from morai_msgs.msg import GPSMessage
+from morai_msgs.msg import EgoDdVehicleStatus
 from collections import deque
 from pyproj import Proj
-from geometry_msgs.msg import PointStamped
 import math
-from std_msgs.msg import Float32
-
 class GPSVel:
     def __init__(self):
         rospy.init_node('GPSVel', anonymous=True)
