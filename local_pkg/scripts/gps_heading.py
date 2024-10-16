@@ -11,15 +11,15 @@ class GpsImuHeading:
 
         rospy.init_node('gps_heading', anonymous=True)
         self.gps_sub = rospy.Subscriber('/gps', GPSMessage, self.gps_callback)
-        self.heading_pub = rospy.Publisher("/heading", PointStamped, queue_size=1)
+        self.heading_pub = rospy.Publisher("/Local/heading", PointStamped, queue_size=1)
+        self.utm_pub = rospy.Publisher("/Local/utm", PointStamped, queue_size=1)
       
         self.proj_UTM = Proj(proj='utm', zone=52, ellps = 'WGS84', preserve_units=False)
 
-        self.gps_distance = 0.03 # gps 이전 점과 현재 점 사이 간격을 어느정도 할것인지. (m단위)
+        self.gps_distance = 0.01 # gps 이전 점과 현재 점 사이 간격을 어느정도 할것인지. (m단위)
         self.gps_array_index = 20 # gps 점을 몇개까지 저장할건지
         self.make_heading_index = 2 # gps heading을 구할 때, 이전 몇 번째의 좌표를 활용할건지
         self.first_gps = True
-        self.check = False
 
         self.current_x = 0.0
         self.current_y = 0.0
@@ -57,9 +57,17 @@ class GpsImuHeading:
 
         self.current_x = easting
         self.current_y = northing
-        self.check = True
+
+        self.publish_utm(self, utm_x, utm_y, stamp)
 
         self.make_gps_heading(stamp)
+
+    def publish_utm(self,x,y,stamp):
+        utm_msg = PointStamped()
+        utm_msg.header.stamp = stamp
+        utm_msg.point.x = x
+        utm_msg.point.y = y
+        self.utm_pub.publish(utm_msg)
 
     def make_gps_heading(self, stamp):
         if self.check:
@@ -71,7 +79,6 @@ class GpsImuHeading:
                 gps_heading_msg.point.x = heading
                 self.heading_pub.publish(gps_heading_msg)
         
-        self.check = False
 
 if __name__ == '__main__':
     try:
