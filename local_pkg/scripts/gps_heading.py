@@ -11,8 +11,7 @@ class GpsImuHeading:
 
         rospy.init_node('gps_heading', anonymous=True)
         self.gps_sub = rospy.Subscriber('/gps', GPSMessage, self.gps_callback)
-        self.heading_pub = rospy.Publisher("/Local/heading", PointStamped, queue_size=1)
-        self.utm_pub = rospy.Publisher("/Local/utm", PointStamped, queue_size=1)
+        self.heading_pub = rospy.Publisher("/Local/odom", PointStamped, queue_size=1)
       
         self.proj_UTM = Proj(proj='utm', zone=52, ellps = 'WGS84', preserve_units=False)
 
@@ -58,25 +57,18 @@ class GpsImuHeading:
         self.current_x = easting
         self.current_y = northing
 
-        self.publish_utm(self, utm_x, utm_y, stamp)
+        self.publish_gps_heading(utm_x, utm_y, stamp)
 
-        self.make_gps_heading(stamp)
-
-    def publish_utm(self,x,y,stamp):
-        utm_msg = PointStamped()
-        utm_msg.header.stamp = stamp
-        utm_msg.point.x = x
-        utm_msg.point.y = y
-        self.utm_pub.publish(utm_msg)
-
-    def make_gps_heading(self, stamp):
+    def publish_gps_heading(self, utm_x, utm_y, stamp):
         if self.check:
             if(len(self.x_array) >= self.make_heading_index):
                 heading = math.atan2(self.y_array[-1]-self.y_array[-self.make_heading_index],self.x_array[-1]-self.x_array[-self.make_heading_index])
 
                 gps_heading_msg = PointStamped()
                 gps_heading_msg.header.stamp = stamp
-                gps_heading_msg.point.x = heading
+                gps_heading_msg.point.x = utm_x
+                gps_heading_msg.point.y = utm_y
+                gps_heading_msg.point.z = heading
                 self.heading_pub.publish(gps_heading_msg)
         
 
