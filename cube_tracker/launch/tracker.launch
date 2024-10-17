@@ -1,0 +1,31 @@
+<launch>
+    <arg name="target_marker_sub_topic"                default="/cluster/bounding_boxes_cube"/>
+    <arg name="tracked_objects_pub_topic"              default="/tracked_objects"/>
+    <arg name="text_tracked_pub_topic"                 default="text_tracked"/>
+    <arg name="arrow_tracked_pub_topic"                default="arrow_tracked"/>
+    <arg name="class_tracked_pub_topic"                default="class_tracked"/>
+    <arg name="frame_id"                               default="os_sensor"/>
+    <arg name="max_age"                                default="7"/>
+    <arg name="min_hits"                               default="3"/>
+    <arg name="score_threshold"                        default="0.3"/>
+    <arg name="dist_threshold"                         default="2.0"/>
+    <arg name="transform"                              default="false"/>
+    <arg name="dist_thres_from_init_pos"               default="3.0"/>
+    <!-- <arg name="transform_target_frame"                 default="base_link"/> -->
+
+    <node pkg="cube_tracker" type="cube_tracker" name="cube_tracker" output="screen">
+        <param name = "target_marker_sub_topic"    type="string"     value = "$(arg target_marker_sub_topic)"/>
+        <param name = "tracked_objects_pub_topic"  type="string"     value = "$(arg tracked_objects_pub_topic)"/>
+        <param name = "text_tracked_pub_topic"     type="string"     value = "$(arg text_tracked_pub_topic)"/>
+        <param name = "arrow_tracked_pub_topic"    type="string"     value = "$(arg arrow_tracked_pub_topic)"/>
+        <param name = "class_tracked_pub_topic"    type="string"     value = "$(arg class_tracked_pub_topic)"/>
+        <param name = "frame_id"                   type="string"     value = "$(arg frame_id)"/>
+        <param name = "max_age"                    type="int"        value = "$(arg max_age)"/>
+        <param name = "min_hits"                   type="int"        value = "$(arg min_hits)"/>
+        <param name = "score_threshold"            type="double"     value = "$(arg score_threshold)"/>
+        <param name = "dist_threshold"             type="double"     value = "$(arg dist_threshold)"/>
+        <param name = "dist_thres_from_init_pos"   type="double"     value = "$(arg dist_thres_from_init_pos)"/>
+        <param name = "transform"                  type="bool"       value = "$(arg transform)"/>
+        <!-- <param name = "transform_target_frame"     type="string"     value = "$(arg transform_target_frame)"/> -->
+    </node>
+</launch>

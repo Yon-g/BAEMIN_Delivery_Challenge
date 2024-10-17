@@ -1,0 +1,20 @@
+<launch>
+    <arg name="core_point_min"         default="10"/>
+    <arg name="cluster_tolerance"      default="0.3"/>
+    <arg name="min_cluster_size"       default="15"/>
+    <arg name="max_cluster_size"       default="350"/>
+    <arg name="time_check"             default="true"/>
+    <arg name="nonground_points_sub"   default="/ground_segmentation/nonground"/>
+    <arg name="clustered_points"       default="/clustered_points"/>
+
+    <node pkg="cube_tracker"   type="cluster" name="cluster" output="screen">
+        <param name = "core_point_min"           type="int"      value = "$(arg core_point_min)"/>
+        <param name = "cluster_tolerance"        type="double"   value = "$(arg cluster_tolerance)"/>
+        <param name = "min_cluster_size"         type="int"      value = "$(arg min_cluster_size)"/>
+        <param name = "max_cluster_size"         type="int"      value = "$(arg max_cluster_size)"/>
+        <param name = "time_check"               type="bool"     value = "$(arg time_check)"/>
+        <param name = "nonground_points_sub"     type="string"   value = "$(arg nonground_points_sub)"/>
+        <param name = "clustered_points"         type="string"   value = "$(arg clustered_points)"/>
+    </node>
+
+</launch>

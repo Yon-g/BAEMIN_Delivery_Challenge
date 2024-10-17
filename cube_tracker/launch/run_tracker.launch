@@ -1,0 +1,5 @@
+<launch>
+    <include file="$(find patchworkpp)/launch/patchwork.launch"/>
+    <include file="$(find cube_tracker)/launch/cluster.launch"/>
+    <include file="$(find cube_tracker)/launch/tracker.launch"/>
+</launch>
