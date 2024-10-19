@@ -122,7 +122,7 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
-  ${PROJ_INCLUDE_DIRS}
+  # ${PROJ_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -135,16 +135,16 @@ include_directories(
 ## either from message generation or dynamic reconfigure
 # add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(PROJ REQUIRED proj)
+# find_package(PkgConfig REQUIRED)
+# pkg_check_modules(PROJ REQUIRED proj)
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/local_pkg_node.cpp)
 
-add_executable(gps_imu src/gps_imu.cpp)
-target_link_libraries(gps_imu ${catkin_LIBRARIES}  ${PROJ_LIBRARIES})
+# add_executable(gps_imu src/gps_imu.cpp)
+# target_link_libraries(gps_imu ${catkin_LIBRARIES}  ${PROJ_LIBRARIES})
 # add_dependencies(talker beginner_tutorials_generate_messages_cpp) 서비스나 메시지 있을 때만 적어줌
 
 ## Rename C++ executable without prefix
