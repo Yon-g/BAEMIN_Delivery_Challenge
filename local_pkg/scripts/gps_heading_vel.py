@@ -20,6 +20,7 @@ class GpsImuHeading:
 
         self.vel_q = deque(maxlen=2)
         self.utm_q = deque(maxlen=2)
+        self.yaw_rate_q = deque(maxlen=2)
 
         self.angular_velocity_z = 0.0
         self.rotation_radius = 0.3
@@ -98,12 +99,22 @@ class GpsImuHeading:
             speed = self.calculate_speed()
             self.vel_q.append(speed)
 
+            time = stamp.to_sec()
+            self.yaw_rate_q.append((heading,time))
+            yaw_rate = 0
+            if len(self.yaw_rate_q)==2:
+                (yaw_pre, time_pre), (yaw_cur, time_cur) = self.yaw_rate_q
+                yaw_rate  = (yaw_cur-yaw_pre) / (time_cur-time_pre)
+                
+
+
             gps_heading_msg = EgoDdVehicleStatus()
             gps_heading_msg.header.stamp = stamp
-            gps_heading_msg.point.x = utm_x
-            gps_heading_msg.point.y = utm_y
-            gps_heading_msg.point.z = heading
-            gps_heading_msg.linear_velocity = sum(self.vel_q) / len(self.vel_q)
+            gps_heading_msg.position.x = utm_x
+            gps_heading_msg.position.y = utm_y
+            gps_heading_msg.position.z = yaw_rate
+            gps_heading_msg.heading = heading
+            gps_heading_msg.linear_velocity.x = sum(self.vel_q) / len(self.vel_q)
             self.odom_pub.publish(gps_heading_msg)
 
 if __name__ == '__main__':
