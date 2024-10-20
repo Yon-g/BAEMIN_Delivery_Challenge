@@ -65,8 +65,8 @@ add_executable(patchworkpp src/patchworkpp.cpp)
 target_link_libraries(patchworkpp ${catkin_LIBRARIES} ${PCL_LIBRARIES} ${OpenCV_LIBRARIES})
 add_dependencies(patchworkpp patchworkpp_generate_messages_cpp)
 
-add_executable(cluster src/point_cluster.cpp)
-target_link_libraries(cluster ${catkin_LIBRARIES} ${PCL_LIBRARIES})
+#add_executable(cluster src/point_cluster.cpp)
+#target_link_libraries(cluster ${catkin_LIBRARIES} ${PCL_LIBRARIES})
 
 add_executable(crop src/point_crop.cpp)
 target_link_libraries(crop ${catkin_LIBRARIES} ${PCL_LIBRARIES})
