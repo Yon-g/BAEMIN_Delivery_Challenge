@@ -1,7 +1,7 @@
 <launch>
-<arg name="cloud_topic" default="/ouster/points"/>
+<arg name="cloud_topic" default="/velodyne_points"/>
 
-  <node name="ground_segmentation" pkg="patchworkpp" type="demo" output="screen">
+  <node name="ground_segmentation" pkg="patchworkpp" type="patchworkpp" output="screen">
     <rosparam command="load" file="$(find patchworkpp)/config/params_lidar.yaml" />
     <param name="cloud_topic" value="$(arg cloud_topic)"/>
   </node>

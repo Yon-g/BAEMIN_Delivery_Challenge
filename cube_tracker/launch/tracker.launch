@@ -4,7 +4,7 @@
     <arg name="text_tracked_pub_topic"                 default="text_tracked"/>
     <arg name="arrow_tracked_pub_topic"                default="arrow_tracked"/>
     <arg name="class_tracked_pub_topic"                default="class_tracked"/>
-    <arg name="frame_id"                               default="os_sensor"/>
+    <arg name="frame_id"                               default="velodyne"/>
     <arg name="max_age"                                default="7"/>
     <arg name="min_hits"                               default="3"/>
     <arg name="score_threshold"                        default="0.3"/>

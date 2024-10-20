@@ -6,6 +6,8 @@
     <arg name="time_check"             default="true"/>
     <arg name="nonground_points_sub"   default="/ground_segmentation/nonground"/>
     <arg name="clustered_points"       default="/clustered_points"/>
+    <arg name="frame_id"       default="velodyne"/>
+    <arg name="lookup_frame"       default="velodyne"/>
 
     <node pkg="cube_tracker"   type="cluster" name="cluster" output="screen">
         <param name = "core_point_min"           type="int"      value = "$(arg core_point_min)"/>
@@ -15,6 +17,8 @@
         <param name = "time_check"               type="bool"     value = "$(arg time_check)"/>
         <param name = "nonground_points_sub"     type="string"   value = "$(arg nonground_points_sub)"/>
         <param name = "clustered_points"         type="string"   value = "$(arg clustered_points)"/>
+        <param name = "frame_id"         type="string"   value = "$(arg frame_id)"/>
+        <param name = "lookup_frame"         type="string"   value = "$(arg lookup_frame)"/>
     </node>
 
 </launch>
