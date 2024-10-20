@@ -1,3 +1,6 @@
+import os,sys
+sys.path.append(os.path.join(os.path.abspath(__file__),'..'))
+
 import math
 from enum import Enum
 
