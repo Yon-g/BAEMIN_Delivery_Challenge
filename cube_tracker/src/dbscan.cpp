@@ -7,6 +7,7 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <math.h>
+#include <deque>
 
 class ObstacleDetection {
 public:
@@ -75,7 +76,7 @@ public:
             double utm_y = gps_utm_y + y + lidar_offset_y;
 
             // 10m 이내인 경우만 저장 (PointCloud 및 UTM)
-            if (distanceFromRobot(utm_x, utm_y) <= 30.0) {
+            if (distanceFromRobot(utm_x, utm_y) <= 4.2) {
                 points.push_back({relative_x, relative_y});
 
                 static_array.data.push_back(utm_x);  // UTM 좌표
@@ -91,7 +92,7 @@ public:
     void applyDBSCAN(const std::vector<std::vector<double>>& points, std_msgs::Float32MultiArray& static_array, std_msgs::Float32MultiArray& dynamic_array) {
         // DBSCAN 파라미터 설정
         double epsilon = 0.5; // 장애물 간 거리 기준
-        int minPts = 5;       // 군집을 형성할 최소 포인트 개수
+        int minPts = 1;       // 군집을 형성할 최소 포인트 개수
 
         std::vector<int> labels(points.size(), -1); // 군집 레이블
         int cluster_id = 0;
@@ -190,10 +191,19 @@ public:
         pcl::PointCloud<pcl::PointXYZ>::Ptr static_cloud(new pcl::PointCloud<pcl::PointXYZ>);
         pcl::PointCloud<pcl::PointXYZ>::Ptr dynamic_cloud(new pcl::PointCloud<pcl::PointXYZ>);
 
-        static const double movement_threshold = 0.1;  // 클러스터가 고정 장애물로 간주될 최소 이동 거리
+        static const double movement_threshold = 1;  // 클러스터가 고정 장애물로 간주될 최소 이동 거리
+        static const int static_cluster_size_threshold = 1;  // 클러스터 크기 임계값
 
         int static_count = 0;
         int dynamic_count = 0;
+
+        // 클러스터 크기 확인하여 정적/동적 장애물 분리
+        std::vector<int> cluster_sizes(centroids.size(), 0);
+        for (size_t i = 0; i < labels.size(); ++i) {
+            if (labels[i] >= 0) {
+                cluster_sizes[labels[i]]++;
+            }
+        }
 
         for (size_t i = 0; i < points.size(); ++i) {
             pcl::PointXYZ point;
@@ -202,24 +212,40 @@ public:
             point.z = 0;
 
             if (labels[i] < 0 || labels[i] >= centroids.size()) {
-                ROS_WARN("Cluster label out of bounds: %d", labels[i]);
                 continue;
             }
 
-            // 클러스터 중심 이동 여부를 확인하여 동적/고정 장애물 분리
-            if (clusterMoved(centroids[labels[i]], movement_threshold)) {
+            // 클러스터 크기가 임계값 이상일 경우 정적 장애물로 간주
+            if (cluster_sizes[labels[i]] >= static_cluster_size_threshold) {
+                static_cloud->points.push_back(point);  // 정적 장애물
+                static_array.data.push_back(gps_utm_x + points[i][0]);
+                static_array.data.push_back(gps_utm_y + points[i][1]);
+                static_count++;
+            } else if (clusterMoved(centroids[labels[i]], movement_threshold)) {
+                // 그렇지 않은 경우 중심점 이동 여부 확인
                 dynamic_cloud->points.push_back(point);  // 동적 장애물
                 dynamic_array.data.push_back(gps_utm_x + points[i][0]);
                 dynamic_array.data.push_back(gps_utm_y + points[i][1]);
                 dynamic_count++;
             } else {
-                static_cloud->points.push_back(point);  // 고정 장애물
+                static_cloud->points.push_back(point);  // 정적 장애물
                 static_array.data.push_back(gps_utm_x + points[i][0]);
                 static_array.data.push_back(gps_utm_y + points[i][1]);
                 static_count++;
             }
         }
 
+        // 최근 고정 장애물 좌표를 기록
+        if (static_obstacle_history.size() >= history_size) {
+            static_obstacle_history.pop_front();
+        }
+        // static_array.data (std::vector<float>)를 std::vector<std::vector<double>>로 변환하여 저장
+        std::vector<std::vector<double>> static_obstacles;
+        for (size_t i = 0; i < static_array.data.size(); i += 2) {
+            static_obstacles.push_back({static_array.data[i], static_array.data[i + 1]});
+        }
+        static_obstacle_history.push_back(static_obstacles);
+        
         publishObstacles(static_cloud, static_obs_pub_, static_array, static_obs_array_pub_, "static", static_count);
         publishObstacles(dynamic_cloud, dynamic_obs_pub_, dynamic_array, dynamic_obs_array_pub_, "dynamic", dynamic_count);
 
@@ -242,8 +268,8 @@ public:
 
         // 이전 클러스터 중심 중에서 가장 가까운 클러스터를 찾음
         for (size_t i = 0; i < prev_cluster_centroids.size(); ++i) {
-            double dx = current_centroid[0] - prev_cluster_centroids[i][0];
-            double dy = current_centroid[1] - prev_cluster_centroids[i][1];
+            double dx = (current_centroid[0] + gps_utm_x - prev_utm_x) - prev_cluster_centroids[i][0];
+            double dy = (current_centroid[1] + gps_utm_y - prev_utm_y) - prev_cluster_centroids[i][1];
             double dist = sqrt(dx * dx + dy * dy);
 
             if (dist < min_distance) {
@@ -276,6 +302,9 @@ private:
 
     // 이전 클러스터 중심 좌표
     std::vector<std::vector<double>> prev_cluster_centroids;
+
+    std::deque<std::vector<std::vector<double>>> static_obstacle_history;
+    const int history_size = 100; // 10 프레임 동안의 장애물 기록 유지
 };
 
 int main(int argc, char** argv) {

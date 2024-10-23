@@ -1,0 +1,12 @@
+{
+    "python.autoComplete.extraPaths": [
+        "/home/baedal/catkin_ws/devel/lib/python3/dist-packages",
+        "/opt/ros/noetic/lib/python3/dist-packages",
+        "/home/baedal/catkin_ws/src/BAEMIN_Delivery_Challenge/delivery"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/baedal/catkin_ws/devel/lib/python3/dist-packages",
+        "/opt/ros/noetic/lib/python3/dist-packages",
+        "/home/baedal/catkin_ws/src/BAEMIN_Delivery_Challenge/delivery"
+    ]
+}
