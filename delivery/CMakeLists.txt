@@ -11,6 +11,10 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   morai_msgs
+  sensor_msgs
+  visualization_msgs
+  geometry_msgs
+  tf
 )
 
 ## System dependencies are found with CMake's conventions
@@ -168,6 +172,7 @@ catkin_install_python(PROGRAMS
   scripts/delivery.py
   scripts/robot_control.py
   scripts/control.py
+  scripts/costmap.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

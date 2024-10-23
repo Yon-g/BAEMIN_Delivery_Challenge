@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   pcl_msgs
   pcl_ros
   roscpp
+  morai_msgs
   sensor_msgs
   std_msgs
   visualization_msgs
@@ -59,9 +60,11 @@ include
 
 add_executable(cube_tracker src/cube_tracker.cpp)
 add_executable(cluster src/cluster.cpp)
+add_executable(dbscan src/dbscan.cpp)
 
 add_dependencies(cube_tracker ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 add_dependencies(cluster ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(dbscan ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(cube_tracker
   ${catkin_LIBRARIES}
@@ -70,6 +73,13 @@ target_link_libraries(cube_tracker
   ${OpenCV_LIBS}
 )
 target_link_libraries(cluster
+  ${catkin_LIBRARIES}
+  ${CERES_LIBRARIES}
+  ${PCL_LIBRARY_DIRS}
+  ${OpenCV_LIBS}
+)
+
+target_link_libraries(dbscan
   ${catkin_LIBRARIES}
   ${CERES_LIBRARIES}
   ${PCL_LIBRARY_DIRS}
