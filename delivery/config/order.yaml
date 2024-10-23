@@ -3,7 +3,31 @@ orders:
     utm_x: 333862.9255915525
     utm_y: 4143041.233943492
     isPickup: true
+  - index: 4
+    utm_x: 333754.5802985069
+    utm_y: 4143090.120730908
+    isPickup: true
   - index: 5
     utm_x: 334204.29729374615
     utm_y: 4142966.2601580895
+    isPickup: false
+  - index: 4
+    utm_x: 334167.17793949996
+    utm_y: 4142964.8525958327
+    isPickup: false
+  - index: 2
+    utm_x: 333883.85747059574
+    utm_y: 4143041.110442668
+    isPickup: true
+  - index: 3
+    utm_x: 333897.5348883511
+    utm_y: 4143126.53635362
+    isPickup: true
+  - index: 3
+    utm_x: 334062.14264591964
+    utm_y: 4142953.324550183
+    isPickup: true
+  - index: -1 # 더미 값
+    utm_x: 0
+    utm_y: 0
     isPickup: false
