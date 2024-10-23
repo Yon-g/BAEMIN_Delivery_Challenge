@@ -4,9 +4,10 @@ from collections import deque
 from sensor_msgs.msg import Imu
 from morai_msgs.msg import GPSMessage
 from morai_msgs.msg import EgoDdVehicleStatus
+from morai_msgs.msg import SkidSteer6wUGVCtrlCmd
+from std_msgs.msg import Int16
 
 from pyproj import Proj
-
 
 class GpsImuHeading:
 
@@ -16,6 +17,9 @@ class GpsImuHeading:
         self.gps_sub = rospy.Subscriber('/gps', GPSMessage, self.gps_callback)
         self.imu_sub = rospy.Subscriber('/imu', Imu, self.imu_callback)
         self.odom_pub = rospy.Publisher("/Local/odom", EgoDdVehicleStatus, queue_size=1)
+        self.warp_pub = rospy.Publisher("/Local/warp", Int16, queue_size=1)
+        self.reset_pub = rospy.Publisher("/Local/reset", Int16, queue_size=1)
+        self.ctrl_pub = rospy.Publisher('/dilly_ctrl', SkidSteer6wUGVCtrlCmd, queue_size=1)
         
         # UTM 변환 설정
         self.proj_UTM = Proj(proj='utm', zone=52, ellps='WGS84', preserve_units=False)
@@ -29,6 +33,7 @@ class GpsImuHeading:
         self.ready = False
         self.first_gps = True
         self.gps_heading_clear = False
+        self.do_not_pub_first_cmd = False # 처음 gps초기화 확인 시까지 속도 pub
         self.gps_init_speed = 0.5 # imu에서 사용하기 전 gps 헤딩 계산 최소 속도
 
         self.gps_distance = 0.01 # gps 이전 점과 현재 점 사이 간격을 어느정도 할것인지. (m단위)
@@ -47,6 +52,13 @@ class GpsImuHeading:
 
         rospy.loginfo("gps_vel node start")
 
+    def send_control(self, linear_velocity, angular_velocity):
+        cmd = SkidSteer6wUGVCtrlCmd()
+        cmd.cmd_type = 3
+        cmd.Target_linear_velocity= linear_velocity
+        cmd.Target_angular_velocity = angular_velocity
+        self.ctrl_pub.publish(cmd)
+
     def gps_callback(self, msg):
 
         stamp = msg.header.stamp
@@ -56,12 +68,24 @@ class GpsImuHeading:
 
         distance = math.sqrt(math.pow(utm_y-self.current_y,2)+math.pow(utm_x-self.current_x,2))
 
-        if self.first_gps == True:
-            self.current_x = utm_x
-            self.current_y = utm_y
-            self.first_gps = False
+        if distance > 300 and self.current_x != 0.0:
+            warp_msg = Int16()
+            warp_msg.data = 1
+            for _ in range(2):
+                self.warp_pub.publish(warp_msg)
+                print(f'warp!!! {distance}')
 
-        elif (self.current_x != utm_x and self.current_y != utm_y) and (distance >= self.gps_distance):
+        elif distance > 3 and self.current_x != 0.0:
+            reset_msg = Int16()
+            reset_msg.data = 1
+            for _ in range(2):
+                self.reset_pub.publish(reset_msg)
+                print(f'reset!!! {distance}')
+        
+        if not self.do_not_pub_first_cmd:
+            self.send_control(1.2,0)
+
+        if (self.current_x != utm_x and self.current_y != utm_y) and (distance >= self.gps_distance):
             
             if(len(self.x_array) >= self.gps_array_index):
                 self.x_array.pop(0)
@@ -125,6 +149,7 @@ class GpsImuHeading:
                 self.gps_heading_clear = True
             
             if self.gps_heading_clear:
+                self.do_not_pub_first_cmd = True
                 heading = math.atan2(self.y_array[-1]-self.y_array[-self.make_heading_index],self.x_array[-1]-self.x_array[-self.make_heading_index])
 
                 if speed < self.stop_speed :
@@ -133,7 +158,7 @@ class GpsImuHeading:
                 if (abs(heading) - abs(self.prev_heading)) > 10:
                     heading = self.prev_heading
 
-                print(f"heading {heading*180/3.14}")
+                # print(f"heading {heading*180/3.14}")
 
                 gps_heading_msg = EgoDdVehicleStatus()
                 gps_heading_msg.header.stamp = stamp
@@ -144,6 +169,9 @@ class GpsImuHeading:
                 gps_heading_msg.linear_velocity.x = sum(self.vel_q) / len(self.vel_q)
                 self.odom_pub.publish(gps_heading_msg)
                 self.prev_heading = heading
+            else:
+                print(f"not enough velocity {speed:.2f}/{self.gps_init_speed}")
+
 
 if __name__ == '__main__':
     try:
