@@ -177,11 +177,8 @@ include_directories(
 # )
 
 catkin_install_python(PROGRAMS
-  scripts/gps_heading.py
   scripts/gps_heading_vel.py
-  scripts/heading_plot.py
-  scripts/kf_gps.py
-  scripts/gps_velocity.py
+  # scripts/heading_plot.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
